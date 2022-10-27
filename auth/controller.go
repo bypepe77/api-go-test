@@ -1,4 +1,4 @@
-package movie
+package auth
 
 import (
 	"github.com/sirupsen/logrus"

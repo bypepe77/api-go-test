@@ -1,11 +1,11 @@
 package main
 
 import (
-	"fmt"
-	"net/http"
 	"os"
 	"strconv"
-	"time"
+	"test-api/auth"
+	database "test-api/databaseSettings"
+	movie "test-api/movies"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -24,10 +24,15 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	moviesCtrl := movie.NewController(log)
+	//database connection
+	db, _ := database.DatabaseConection()
 
+	moviesCtrl := movie.NewController(log, db)
+	authCtrl := auth.NewController(log, db)
+	
 	//Create API routes and middlewaress
 	moviesCtrl.SetApiRoutes(router)
+	authCtrl.SetApiRoutes(router)
 
 	portString := os.Getenv("PORT")
 
@@ -36,19 +41,23 @@ func main() {
 		port = 8080
 	}
 
-	server := &http.Server{
-		Addr:         fmt.Sprintf(":%d", port),
-		Handler:      router,
-		ReadTimeout:  30 * time.Second,
-		WriteTimeout: 30 * time.Second,
-		IdleTimeout:  120 * time.Second,
-	}
-
-	go func() {
-		log.Info("server started on port ", port)
-		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatal(err)
+	router.Run(":" + portString)
+	/*
+		server := &http.Server{
+			Addr:         fmt.Sprintf(":%d", port),
+			Handler:      router,
+			ReadTimeout:  30 * time.Second,
+			WriteTimeout: 30 * time.Second,
+			IdleTimeout:  120 * time.Second,
 		}
-	}()
+
+		go func() {
+			log.Info("server started on port ", port)
+			if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+				log.Fatal(err)
+			}
+		}()
+
+	*/
 
 }

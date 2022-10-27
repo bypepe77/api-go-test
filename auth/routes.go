@@ -1,10 +1,10 @@
-package movie
+package auth
 
 import (
 	"github.com/gin-gonic/gin"
 )
 
 func (ctrl *Controller) SetApiRoutes(r *gin.Engine) {
-	r.GET("/movies", ctrl.GetMovies)
-	r.GET("/movies/:id", ctrl.GetMovie)
+	r.POST("/auth/register", ctrl.Register)
+	r.POST("/auth/login", ctrl.Login)
 }
